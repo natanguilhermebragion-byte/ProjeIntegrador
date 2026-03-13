@@ -38,23 +38,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['dataInicioContrato'], $_POST['dataFinalContrato']
         ]);
         
-        $idContrato = $pdo->lastInsertId(); // Pega o ID do contrato gerado
+        $idContrato = $pdo->lastInsertId(); // Pega o ID do contrato gerado para o PDF
 
-        // 4. GERAR PARCELAS NO CALENDÁRIO (Loop Automático)
+        // 4. GERAR PARCELAS NO CALENDÁRIO COM NUMERAÇÃO
         for ($i = 1; $i <= $qtdParcela; $i++) {
-            // Calcula a data de vencimento: soma 1 mês para cada parcela
             $dataVencimento = date('Y-m-d', strtotime($_POST['dataInicioContrato'] . " + " . ($i-1) . " month"));
             
-            // O INSERT inclui a data_pagamento na tabela tb_calendario
-            $sqlParcela = "INSERT INTO tb_calendario (id_contrato, data_pagamento, confirmacao_pagamento) 
-                           VALUES (?, ?, 'pendente')";
+            $sqlParcela = "INSERT INTO tb_calendario (id_contrato, numero_parcela, data_pagamento, confirmacao_pagamento) 
+                           VALUES (?, ?, ?, 'pendente')";
             
             $stmtParcela = $pdo->prepare($sqlParcela);
-            $stmtParcela->execute([$idContrato, $dataVencimento]);
+            $stmtParcela->execute([$idContrato, $i, $dataVencimento]);
         }
 
+        // Finaliza a transação no banco de dados
         $pdo->commit(); 
-        header("Location: ../index.php?sucesso=1");
+
+        // Redireciona passando o ID do contrato para a página de sucesso onde estará o botão do PDF
+        header("Location: ../view/sucesso_cadastro.php?id_contrato=" . $idContrato);
         exit;
 
     } catch (Exception $e) {

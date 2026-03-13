@@ -57,31 +57,31 @@ try {
                 </div>
 
                 <h3>Endereço de Atendimento</h3>
-                <div class="grid-2" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <div style="flex: 3;">
-                        <label class="muted">Rua / Logradouro</label>
-                        <input type="text" name="logradouro" placeholder="Ex: Rua das Flores" required>
-                    </div>
+                <div class="grid-2">
                     <div style="flex: 1;">
-                        <label class="muted">Número</label>
-                        <input type="text" name="numero" placeholder="123" required>
+                        <label class="muted">CEP</label>
+                        <input type="text" name="cep" id="cep" maxlength="9" onblur="buscaCEP()" placeholder="00000-000" required>
+                    </div>
+                    <div style="flex: 2;">
+                        <label class="muted">Logradouro (Rua)</label>
+                        <input type="text" name="logradouro" id="logradouro" placeholder="Preenchimento automático" required>
                     </div>
                 </div>
 
-                <div class="grid-2" style="display: flex; gap: 10px; margin-top: 10px;">
+                <div class="grid-2">
                     <div style="flex: 1;">
-                        <label class="muted">Bairro</label>
-                        <input type="text" name="bairro" required>
+                        <label class="muted">Número</label>
+                        <input type="text" name="numero" id="numero" placeholder="123" required>
                     </div>
-                    <div style="flex: 1;">
-                        <label class="muted">CEP</label>
-                        <input type="text" name="cep" required>
+                    <div style="flex: 2;">
+                        <label class="muted">Bairro</label>
+                        <input type="text" name="bairro" id="bairro" placeholder="Preenchimento automático" required>
                     </div>
                 </div>
 
                 <div style="margin-top: 10px;">
                     <label class="muted">Complemento / Ponto de Referência</label>
-                    <input type="text" name="complemento" placeholder="Ex: Apartamento 12, Próximo ao mercado">
+                    <input type="text" name="complemento" id="complemento" placeholder="Ex: Apartamento 12, Próximo ao mercado">
                 </div>
             </section>
 
@@ -156,5 +156,34 @@ try {
             </section>
         </form>
     </div>
+
+    <script>
+    function buscaCEP() {
+        let cep = document.getElementById('cep').value.replace(/\D/g, '');
+        if (cep !== "") {
+            let validacep = /^[0-9]{8}$/;
+            if(validacep.test(cep)) {
+                document.getElementById('logradouro').value = "...";
+                document.getElementById('bairro').value = "...";
+
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(dados => {
+                        if (!("erro" in dados)) {
+                            document.getElementById('logradouro').value = dados.logradouro;
+                            document.getElementById('bairro').value = dados.bairro;
+                            document.getElementById('numero').focus();
+                        } else {
+                            alert("CEP não encontrado.");
+                            document.getElementById('cep').value = "";
+                        }
+                    })
+                    .catch(() => alert("Erro ao buscar o CEP. Verifique sua conexão."));
+            } else {
+                alert("Formato de CEP inválido.");
+            }
+        }
+    }
+    </script>
 </body>
 </html>

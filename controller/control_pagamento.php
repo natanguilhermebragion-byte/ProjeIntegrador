@@ -2,19 +2,26 @@
 require_once __DIR__ . '/../config/conexao.php';
 
 if (isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-
+    $id = $_GET['id'];
+    
     try {
-        // Atualiza o status na tb_calendario para 'confirmado'
-        $sql = "UPDATE tb_calendario SET confirmacao_pagamento = 'confirmado' WHERE id_calendario = :id";
+        // Atualiza o status para 'confirmado' na tb_calendario
+        $sql = "UPDATE tb_calendario SET confirmacao_pagamento = 'confirmado' WHERE id_calendario = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([':id' => $id]);
-
-        // Volta para o painel principal
-        header("Location: ../index.php");
-        exit;
+        
+        if ($stmt->execute([$id])) {
+            // Volta para o painel com um marcador de sucesso na URL
+            header("Location: ../index.php?sucesso_pagamento=1");
+            exit;
+        } else {
+            echo "Erro ao processar o pagamento no banco de dados.";
+        }
 
     } catch (PDOException $e) {
-        die("Erro ao atualizar pagamento: " . $e->getMessage());
+        die("Erro crítico ao atualizar pagamento: " . $e->getMessage());
     }
+} else {
+    // Se acessar o arquivo sem ID, volta para o index
+    header("Location: ../index.php");
+    exit;
 }
