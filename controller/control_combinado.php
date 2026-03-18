@@ -38,28 +38,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['dataInicioContrato'], $_POST['dataFinalContrato']
         ]);
         
-        $idContrato = $pdo->lastInsertId(); // Pega o ID do contrato gerado para o PDF
+        $idContrato = $pdo->lastInsertId(); 
 
-        // 4. GERAR PARCELAS NO CALENDÁRIO COM NUMERAÇÃO
-        for ($i = 1; $i <= $qtdParcela; $i++) {
-            $dataVencimento = date('Y-m-d', strtotime($_POST['dataInicioContrato'] . " + " . ($i-1) . " month"));
+        // --- 4. GERAR PARCELAS NO CALENDÁRIO COM DIA DE VENCIMENTO FIXO ---
+        
+        $dataBase = new DateTime($_POST['dataInicioContrato']);
+        $diaVencimentoEscolhido = (int)$_POST['diaVencimento'];
+
+        for ($i = 0; $i < $qtdParcela; $i++) {
+            // Criamos uma cópia da data base para cada mês
+            $dataParcela = clone $dataBase;
+            $dataParcela->modify("+$i month");
             
+            // Forçamos o dia da parcela para o dia de vencimento escolhido no formulário
+            $dataParcela->setDate(
+                (int)$dataParcela->format('Y'), 
+                (int)$dataParcela->format('m'), 
+                $diaVencimentoEscolhido
+            );
+            
+            $dataFinalFormatada = $dataParcela->format('Y-m-d');
+            $numParcela = $i + 1;
+
             $sqlParcela = "INSERT INTO tb_calendario (id_contrato, numero_parcela, data_pagamento, confirmacao_pagamento) 
                            VALUES (?, ?, ?, 'pendente')";
             
             $stmtParcela = $pdo->prepare($sqlParcela);
-            $stmtParcela->execute([$idContrato, $i, $dataVencimento]);
+            $stmtParcela->execute([$idContrato, $numParcela, $dataFinalFormatada]);
         }
 
         // Finaliza a transação no banco de dados
         $pdo->commit(); 
 
-        // Redireciona passando o ID do contrato para a página de sucesso onde estará o botão do PDF
+        // Redireciona para a página de sucesso
         header("Location: ../view/sucesso_cadastro.php?id_contrato=" . $idContrato);
         exit;
 
     } catch (Exception $e) {
-        $pdo->rollBack(); 
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack(); 
+        }
         die("Erro no cadastro unificado: " . $e->getMessage());
     }
 }

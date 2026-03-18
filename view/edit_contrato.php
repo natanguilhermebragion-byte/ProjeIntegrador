@@ -40,7 +40,10 @@ try {
         h3 { margin-top: 20px; color: #3b82f6; border-bottom: 1px solid #334155; padding-bottom: 5px; font-size: 18px; }
         label { font-size: 12px; color: #94a3b8; display: block; margin-bottom: 5px; }
         input, select { width:100%; padding:10px; background:#0b1220; border:1px solid #334155; color:white; border-radius:8px; margin-bottom:10px; }
-        .btn-save { background: #059669; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: 700; width:100%; font-size: 16px; margin-top: 20px; }
+        .btn-save { background: #059669; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: 700; width:100%; font-size: 16px; margin-top: 20px; text-transform: uppercase; }
+        
+        .secao-parcelas { background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; }
+        h4 { color: #3b82f6; margin-top: 0; margin-bottom: 10px; font-size: 15px; }
     </style>
 </head>
 <body>
@@ -100,8 +103,8 @@ try {
                 </div>
             </section>
 
-            <section class="card" style="margin-top:20px; border: 1px solid #f59e0b;">
-                <h3 style="color: #f59e0b;">Dados do Contrato e Parcelas</h3>
+            <section class="card" style="margin-top:20px; border: 1px solid #334155;">
+                <h3 style="color: #3b82f6;">Dados do Contrato e Parcelas</h3>
                 <div class="grid-2">
                     <div>
                         <label>Valor Total do Contrato (R$)</label>
@@ -121,33 +124,35 @@ try {
                     </div>
                 </div>
 
-                <h4 style="color: #f59e0b; margin-top: 15px; font-size: 14px;">Parcelas Atuais (Ajuste Individual)</h4>
-                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">Dica: Se você mudar a "Qtd. Total" acima, o sistema ajustará o calendário automaticamente ao salvar.</p>
-                
-                <div style="background: #1e293b; padding: 10px; border-radius: 8px;">
-                    <?php
-                    $stmtPar = $pdo->prepare("SELECT * FROM tb_calendario WHERE id_contrato = ? ORDER BY numero_parcela ASC");
-                    $stmtPar->execute([$id_contrato]);
-                    $parcelas = $stmtPar->fetchAll(PDO::FETCH_OBJ);
+                <div class="secao-parcelas" style="margin-top: 20px;">
+                    <h4>Parcelas Atuais (Ajuste Individual)</h4>
+                    <p style="font-size: 11px; color: #94a3b8; margin-bottom: 15px;">Dica: Se você mudar a "Qtd. Total" acima, o sistema ajustará o calendário automaticamente ao salvar.</p>
+                    
+                    <div style="background: #0b1220; padding: 10px; border-radius: 8px; border: 1px solid #334155;">
+                        <?php
+                        $stmtPar = $pdo->prepare("SELECT * FROM tb_calendario WHERE id_contrato = ? ORDER BY numero_parcela ASC");
+                        $stmtPar->execute([$id_contrato]);
+                        $parcelas = $stmtPar->fetchAll(PDO::FETCH_OBJ);
 
-                    foreach($parcelas as $p): ?>
-                        <div class="grid-2" style="align-items: center; border-bottom: 1px solid #334155; padding: 5px 0;">
-                            <div style="flex: 0.5; font-weight: bold;">#<?= $p->numero_parcela ?></div>
-                            <div style="flex: 2;">
-                                <input type="date" name="parcelas[<?= $p->id_calendario ?>][data]" value="<?= $p->data_pagamento ?>" style="margin:0; padding: 5px;">
+                        foreach($parcelas as $p): ?>
+                            <div class="grid-2" style="align-items: center; border-bottom: 1px solid #334155; padding: 8px 0;">
+                                <div style="flex: 0.5; font-weight: bold; color: #3b82f6; padding-left: 5px;">#<?= $p->numero_parcela ?></div>
+                                <div style="flex: 2;">
+                                    <input type="date" name="parcelas[<?= $p->id_calendario ?>][data]" value="<?= $p->data_pagamento ?>" style="margin:0; padding: 5px; font-size: 13px;">
+                                </div>
+                                <div style="flex: 2;">
+                                    <select name="parcelas[<?= $p->id_calendario ?>][status]" style="margin:0; padding: 5px; font-size: 13px;">
+                                        <option value="pendente" <?= ($p->confirmacao_pagamento == 'pendente') ? 'selected' : '' ?>>Pendente</option>
+                                        <option value="confirmado" <?= ($p->confirmacao_pagamento == 'confirmado') ? 'selected' : '' ?>>Confirmado</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div style="flex: 2;">
-                                <select name="parcelas[<?= $p->id_calendario ?>][status]" style="margin:0; padding: 5px;">
-                                    <option value="pendente" <?= ($p->confirmacao_pagamento == 'pendente') ? 'selected' : '' ?>>Pendente</option>
-                                    <option value="pago" <?= ($p->confirmacao_pagamento == 'pago') ? 'selected' : '' ?>>Pago</option>
-                                </select>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </section>
 
-            <button type="submit" class="btn-save">ATUALIZAR TUDO (DADOS E PARCELAS)</button>
+            <button type="submit" class="btn-save">ATUALIZAR</button>
         </form>
     </div>
 
