@@ -1,34 +1,29 @@
 <?php
 require_once __DIR__ . '/../config/conexao.php';
 
-if (isset($_GET['id_contrato']) && isset($_GET['id_cliente'])) {
+if (isset($_GET['id_contrato'])) {
+    $id_contrato = $_GET['id_contrato'];
+
     try {
         $pdo->beginTransaction();
 
-        // 1. Excluir parcelas do calendário associadas ao contrato
-        $stmt = $pdo->prepare("DELETE FROM tb_calendario WHERE id_contrato = ?");
-        $stmt->execute([$_GET['id_contrato']]);
+        // 1. Apagar as parcelas do calendário ligadas a este contrato (Evita o erro 1451)
+        $sql1 = "DELETE FROM tb_calendario WHERE id_contrato = ?";
+        $pdo->prepare($sql1)->execute([$id_contrato]);
 
-        // 2. Excluir o contrato
-        $stmt = $pdo->prepare("DELETE FROM tb_contrato WHERE id_contrato = ?");
-        $stmt->execute([$_GET['id_contrato']]);
+        // 2. Apagar o contrato
+        $sql2 = "DELETE FROM tb_contrato WHERE id_contrato = ?";
+        $pdo->prepare($sql2)->execute([$id_contrato]);
 
-        // 3. Excluir os alunos vinculados ao cliente
-        $stmt = $pdo->prepare("DELETE FROM tb_alunos WHERE id_cliente = ?");
-        $stmt->execute([$_GET['id_cliente']]);
-
-        // 4. Excluir o cliente/responsável
-        $stmt = $pdo->prepare("DELETE FROM tb_clientes WHERE id_cliente = ?");
-        $stmt->execute([$_GET['id_cliente']]);
+        // NOTA: Se você quiser apagar apenas o contrato e manter o cliente vivo, 
+        // a operação deve parar aqui.
 
         $pdo->commit();
         header("Location: ../index.php?excluido=1");
         exit;
+
     } catch (Exception $e) {
         $pdo->rollBack();
-        die("Erro crítico ao excluir: " . $e->getMessage());
+        die("Erro ao excluir contrato: " . $e->getMessage());
     }
-} else {
-    header("Location: ../index.php");
-    exit;
 }

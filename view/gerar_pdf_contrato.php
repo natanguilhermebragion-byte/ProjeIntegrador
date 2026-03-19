@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/conexao.php';
+
 // Carregamento da biblioteca Dompdf
 if (file_exists(__DIR__ . '/../libs/dompdf/autoload.inc.php')) {
     require_once __DIR__ . '/../libs/dompdf/autoload.inc.php';
@@ -11,17 +12,18 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $id_contrato = $_GET['id'];
 
-    // Busca dados do Contrato, Cliente e Aluno
-    $sql = "SELECT c.*, cl.*, a.*, e.nomeEscola 
+    // CONSULTA CORRETA: Busca o contrato e o aluno ESPECÍFICO deste contrato para evitar troca de nomes entre irmãos
+    $sql = "SELECT c.*, a.*, cl.*, e.nomeEscola 
             FROM tb_contrato c
-            JOIN tb_clientes cl ON c.id_cliente = cl.id_cliente
-            JOIN tb_alunos a ON c.id_cliente = a.id_cliente
+            INNER JOIN tb_alunos a ON c.id_aluno = a.id_aluno
+            INNER JOIN tb_clientes cl ON c.id_cliente = cl.id_cliente
             LEFT JOIN tb_escolas e ON a.id_escola = e.id
             WHERE c.id_contrato = ?";
+            
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$id]);
+    $stmt->execute([$id_contrato]);
     $d = $stmt->fetch(PDO::FETCH_OBJ);
 
     if (!$d) die("Erro: Contrato não encontrado.");
@@ -74,17 +76,17 @@ if (isset($_GET['id'])) {
         
         <div class='clausula'><strong>5ª) O valor total do contrato será de R$ " . number_format($d->valorTotalContrato, 2, ',', '.') . ", que será pago em {$d->qtdParcela} parcelas de R$ " . number_format($d->valorParcela, 2, ',', '.') . " tendo início em {$dataInicioFormatada} e término em {$dataFimFormatada}.</strong> </div>
 
-        <div class='clausula'>6ª) As parcelas não quitadas até o vencimento serão acrescidas de 20,00 mais multa diária e 1%./div>
-        <div class='clausula'>7ª) Para as inscrições dos novos alunos(a)s, será cobrado a matricula assegurando a vaga.</div>
+        <div class='clausula'>6ª) As parcelas não quitadas até o vencimento serão acrescidas de R$ 20,00 de multa mais juros diários de 1%.</div>
+        <div class='clausula'>7ª) Para as inscrições dos novos alunos(a)s, será cobrada a matrícula assegurando a vaga.</div>
         <div class='clausula'>8ª) As parcelas serão corrigidas toda vez que houver aumento do combustível.</div>
         <div class='clausula'>9º) O período de férias será cobrado normalmente, devido ser um contrato com valor fechado.</div>
-        <div class='clausula'>10º) Se o responsável cancelar o transporte em qualquer época do ano deverá pagar multa de referente a duas parcelas do valor do contrato. </div>
+        <div class='clausula'>10º) Se o responsável cancelar o transporte em qualquer época do ano deverá pagar multa referente a duas parcelas do valor do contrato. </div>
         <div class='clausula'>11ª) O CONTRATADO compromete-se a oferecer veículos em bom estado e condições de uso.</div>
-        <div class='clausula'>12ª) Não será permitido comer no interior veículo. </div>
-        <div class='clausula'>13ª) Os pais ficam responsável em avisar com antecedência caso o aluno esteja impossibilitado de ir. </div>
+        <div class='clausula'>12ª) Não será permitido comer no interior do veículo. </div>
+        <div class='clausula'>13ª) Os pais ficam responsáveis em avisar com antecedência caso o aluno esteja impossibilitado de ir. </div>
         <div class='clausula'>14ª) Caso o aluno se afaste temporariamente por qualquer motivo esse período será cobrado normalmente. </div>
-        <div class='clausula'>15ª) Não Transportamos criança doente em hipótese alguma.</div>
-        <div class='clausula'>16ª) Em Hipótese nenhuma entregamos em outro endereço que não seja o do contrato.</div>
+        <div class='clausula'>15ª) Não transportamos criança doente em hipótese alguma.</div>
+        <div class='clausula'>16ª) Em hipótese nenhuma entregamos em outro endereço que não seja o do contrato.</div>
         <div class='clausula'>17ª) Vistorias obrigatórias ocorrerão em Abril e Outubro; nestes dias não haverá serviço. </div>
         <div class='clausula'>18ª) Encerramento das atividades segue o calendário das escolas estaduais (dezembro). </div>
         <div class='clausula'>19ª) Em caso de defeito no veículo, o contratado poderá suspender o transporte por até 3 dias úteis. </div>
