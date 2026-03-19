@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/conexao.php';
 
-// Busca clientes e escolas para popular os selects do formulário
+// busca clientes e escolas pra deixar os selects do formulário mais "cheios"
 $clientes = $pdo->query("SELECT id_cliente, NomeCompleto FROM tb_clientes ORDER BY NomeCompleto")->fetchAll();
 $escolas  = $pdo->query("SELECT id, nomeEscola FROM tb_escolas ORDER BY nomeEscola")->fetchAll();
 ?>

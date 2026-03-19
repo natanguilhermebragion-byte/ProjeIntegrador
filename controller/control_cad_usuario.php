@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cpf = $_POST['cpf'];
     $telefone = $_POST['telefone'];
     
-    // Criptografia da senha (Segurança)
+    // criptografia da senha :3
     $senhaHash = password_hash($_POST['senha'], PASSWORD_DEFAULT);
 
     try {

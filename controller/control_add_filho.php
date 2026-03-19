@@ -5,8 +5,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // 1. SALVAR ALUNO
-        // Tratamento para garantir que id_escola seja numérico ou NULL
+        // Salvar aluno
+       
         $id_escola = !empty($_POST['id_escola']) ? (int)$_POST['id_escola'] : null;
         
         $sqlAlu = "INSERT INTO tb_alunos (nomeCompleto, id_cliente, id_escola, serie, sala, dataNascimento, tipo_transporte, horario_aluno) 
@@ -23,10 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['horario_aluno']
         ]);
 
-        // 2. PEGA O ID DO ALUNO QUE ACABOU DE SER CRIADO
+        
         $id_novo_aluno = $pdo->lastInsertId();
 
-        // 3. SALVAR CONTRATO VINCULADO AO ALUNO
+        // salva contato vinculado ao aluno
         $valorTotal = (float)$_POST['valorTotalContrato'];
         $qtdParcela = (int)$_POST['qtdParcela'];
         $valorParcela = $valorTotal / $qtdParcela;
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $idContrato = $pdo->lastInsertId();
 
-        // 4. GERAR CALENDÁRIO COM VENCIMENTO FIXO
+        // gera o calendário com vencimento fixo
         $dataBase = new DateTime($_POST['dataInicioContrato']);
         $diaVenc = (int)$_POST['diaVencimento'];
 
@@ -67,16 +67,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
         }
 
-        // Finaliza a transação com sucesso
+        
         $pdo->commit();
         
-        // --- AUTOMAÇÃO PDF ---
-        // Redireciona para a tela intermediária que oferece o botão de gerar PDF
+        // Parte do pdf pra automatizar
+        
         header("Location: ../view/sucesso_cadastro.php?id_contrato=" . $idContrato);
         exit;
 
     } catch (Exception $e) {
-        // Se algo der errado, desfaz tudo para não ter lixo no banco
+        // se algo dá errado, aqui ele desfaz
         if ($pdo->inTransaction()) { 
             $pdo->rollBack(); 
         }

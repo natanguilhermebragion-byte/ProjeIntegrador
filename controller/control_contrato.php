@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dataInicio         = $_POST['dataInicioContrato'];
     $dataFim            = $_POST['dataFinalContrato'];
 
-    // Cálculo automático do valor da parcela
+    
     $valorParcela = $valorTotal / $qtdParcela;
 
     try {

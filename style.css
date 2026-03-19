@@ -60,19 +60,19 @@ input[type="search"] {
 
 table { width: 100%; border-collapse: collapse; }
 
-/* No seu style.css, substitua ou ajuste esta parte: */
+
 th, td { 
-    padding: 12px 15px; /* O primeiro valor é vertical, o segundo é horizontal */
+    padding: 12px 15px; 
     border-bottom: 1px solid var(--line); 
     font-size: 14px; 
     text-align: left;
-    white-space: nowrap; /* Evita que o texto quebre em duas linhas e sufoque a tabela */
+    white-space: nowrap; 
 }
 
-/* Garante que a classe 'right' realmente alinhe e mantenha distância */
+
 .right { 
     text-align: right; 
-    padding-right: 20px; /* Adiciona um espaço extra na direita do valor */
+    padding-right: 20px; 
 }
 
 th { color: var(--muted); font-weight: 600; }

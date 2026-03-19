@@ -8,10 +8,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $telefone = $_POST['telefone'] ?? '';
     $endereco = $_POST['endereco'] ?? '';
     $rg       = $_POST['rg'] ?? '';
-    $cep      = $_POST['cep'] ?? ''; // Adicione esta linha
+    $cep      = $_POST['cep'] ?? ''; 
 
     try {
-        // Adicione o campo 'cep' no INSERT e no VALUES
+       
         $sql = "INSERT INTO tb_clientes (NomeCompleto, cpf, email, telefone, endereco, rg, cep) 
                 VALUES (:nome, :cpf, :email, :telefone, :endereco, :rg, :cep)";
         
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':telefone' => $telefone,
             ':endereco' => $endereco,
             ':rg'       => $rg,
-            ':cep'      => $cep // Envie o valor aqui
+            ':cep'      => $cep 
         ]);
 
         header("Location: ../view/cad_cliente.php?sucesso=1");

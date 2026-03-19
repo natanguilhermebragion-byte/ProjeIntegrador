@@ -5,7 +5,7 @@ require_once __DIR__ . '/../config/conexao.php';
 if (isset($_GET['id'])) {
     $id_para_excluir = $_GET['id'];
 
-    // Impede que o usuário logado apague a si próprio por acidente
+    // impede que o usuario logado apague a si mesmo por acidente
     if ($id_para_excluir == $_SESSION['usuario_id']) {
         die("Erro: Você não pode excluir sua própria conta enquanto estiver logado.");
     }

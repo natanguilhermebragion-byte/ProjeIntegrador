@@ -6,11 +6,11 @@ if (isset($_GET['id'])) {
     $id_aluno = $_GET['id'];
 
     try {
-        // Remove apenas o aluno da tb_alunos
+        // remove só o aluno da tb_alunos
         $stmt = $pdo->prepare("DELETE FROM tb_alunos WHERE id_aluno = ?");
         $stmt->execute([$id_aluno]);
 
-        // Redireciona de volta para o painel na aba de alunos
+        // redireciona de volta pro painel na aba de alunos
         header("Location: ../index.php?aluno_removido=1");
         exit;
 

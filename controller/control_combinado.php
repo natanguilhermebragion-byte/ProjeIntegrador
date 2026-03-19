@@ -5,7 +5,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // 1. INSERIR CLIENTE (RESPONSÁVEL)
+        // Inserir cliente (responsável do aluno)
         $sqlCli = "INSERT INTO tb_clientes (NomeCompleto, cpf, rg, telefone, email, cep, logradouro, numero, bairro, complemento, nome_segundo_resp, telefone_segundo_resp, email_segundo_resp) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmtCli = $pdo->prepare($sqlCli);
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         $id_cliente = $pdo->lastInsertId();
 
-        // 2. INSERIR ALUNO (VINCULADO AO CLIENTE)
+        // Inserir aluno (vinculado ao responsável/cliente)
         $id_escola = !empty($_POST['id_escola']) ? (int)$_POST['id_escola'] : null;
         $sqlAlu = "INSERT INTO tb_alunos (nomeCompleto, id_cliente, id_escola, serie, sala, dataNascimento, tipo_transporte, horario_aluno) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -27,10 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['sala'], $_POST['dataNascimento'], $_POST['tipo_transporte'], $_POST['horario_aluno']
         ]);
         
-        // PEGAMOS O ID DO ALUNO RECENTE PARA O VÍNCULO DO CONTRATO
+      
         $id_aluno = $pdo->lastInsertId();
 
-        // 3. INSERIR CONTRATO (VINCULADO AO CLIENTE E AO ALUNO)
+        // Insere contrato vinculado ao aluno e cliente
         $valorTotal = (float)$_POST['valorTotalContrato'];
         $qtdParcela = (int)$_POST['qtdParcela'];
         $valorParcela = $valorTotal / $qtdParcela;
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         $id_contrato = $pdo->lastInsertId();
 
-        // 4. GERAR CALENDÁRIO COM VENCIMENTO FIXO
+        // Gera calendario com vencimento estatico
         $dataBase = new DateTime($_POST['dataInicioContrato']);
         $diaVenc = (int)$_POST['diaVencimento'];
 
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $dataParc = clone $dataBase;
             $dataParc->modify("+$i month");
             
-            // Força o dia da parcela para o dia de vencimento escolhido
+            // Força o dia da parcela pro dia de vencimento escolhido
             $dataParc->setDate((int)$dataParc->format('Y'), (int)$dataParc->format('m'), $diaVenc);
             
             $sqlP = "INSERT INTO tb_calendario (id_contrato, numero_parcela, data_pagamento, confirmacao_pagamento) 
@@ -62,10 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare($sqlP)->execute([$id_contrato, ($i + 1), $dataParc->format('Y-m-d')]);
         }
 
-        // Finaliza a transação com sucesso
+       
         $pdo->commit();
 
-        // --- REDIRECIONAMENTO PARA TELA DE PDF ---
+        // redireciona pra tela de pdf
         header("Location: ../view/sucesso_cadastro.php?id_contrato=" . $id_contrato);
         exit;
 

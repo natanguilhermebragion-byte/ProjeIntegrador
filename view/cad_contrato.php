@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/conexao.php';
-// Busca os clientes para o select
+
+    // busca os clientes para o select
 $clientes = $pdo->query("SELECT id_cliente, NomeCompleto FROM tb_clientes ORDER BY NomeCompleto")->fetchAll();
 ?>
 <!DOCTYPE html>

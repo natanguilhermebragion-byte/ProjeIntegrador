@@ -5,7 +5,7 @@ if (!isset($_GET['id'])) { header("Location: ../index.php"); exit; }
 
 $id_contrato = $_GET['id'];
 
-// Busca os dados do contrato, nome do aluno e o dia de vencimento original do calendário
+// busca os dados do contrato, nome do aluno e o dia de vencimento original do calendario
 $stmt = $pdo->prepare("SELECT c.*, a.nomeCompleto as aluno, 
                         (SELECT DAY(data_pagamento) FROM tb_calendario WHERE id_contrato = c.id_contrato LIMIT 1) as dia_vencimento
                        FROM tb_contrato c 
@@ -16,7 +16,7 @@ $con = $stmt->fetch(PDO::FETCH_OBJ);
 
 if (!$con) { die("Contrato não encontrado."); }
 
-// Busca as parcelas deste contrato
+// busca as parcelas deste contrato
 $parcelas = $pdo->prepare("SELECT * FROM tb_calendario WHERE id_contrato = ? ORDER BY numero_parcela ASC");
 $parcelas->execute([$id_contrato]);
 $lista_parcelas = $parcelas->fetchAll(PDO::FETCH_OBJ);

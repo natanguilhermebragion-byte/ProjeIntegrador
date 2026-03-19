@@ -6,12 +6,12 @@ if (isset($_GET['id'])) {
     $id_calendario = $_GET['id'];
 
     try {
-        // Altera o status de volta para pendente
+        // altera o status de volta pra pendente
         $sql = "UPDATE tb_calendario SET confirmacao_pagamento = 'pendente' WHERE id_calendario = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$id_calendario]);
 
-        // Redireciona com um aviso de estorno realizado
+        // redireciona com um aviso de que foi estornado
         header("Location: ../index.php?estorno=1");
         exit;
 

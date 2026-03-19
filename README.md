@@ -1,7 +1,11 @@
 🚐 Projeto Registro • Transporte Escolar
 Sistema de gestão para serviços de transporte escolar, focado no controle de contratos, alunos, responsáveis e automação de pagamentos.
 
+
+
 🚀 Funcionalidades Principais
+
+
 👥 Gestão de Clientes: Cadastro completo de responsáveis com endereços e contatos.
 
 🎒 Controle de Alunos: Vínculo de alunos a escolas, séries, horários e tipos de transporte.
@@ -14,7 +18,11 @@ Sistema de gestão para serviços de transporte escolar, focado no controle de c
 
 ⚙️ Segurança: Sistema de login e controle de usuários do sistema.
 
+
+
+
 🛠️ Tecnologias Utilizadas
+
 Linguagem: PHP 8.0+
 
 Banco de Dados: MySQL / MariaDB
@@ -25,8 +33,12 @@ Bibliotecas: Dompdf para geração de PDFs.
 
 Arquitetura: Estrutura organizada em view, controller e config.
 
+
+
 📦 Como Instalar e Executar
 Siga os passos abaixo para rodar o projeto localmente (usando XAMPP, WAMP ou Laragon):
+
+
 
 1. Clonar o Repositório
 Bash

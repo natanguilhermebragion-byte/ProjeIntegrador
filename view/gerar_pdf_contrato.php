@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/conexao.php';
 
-// Carregamento da biblioteca Dompdf
+// carregamento da biblioteca Dompdf
 if (file_exists(__DIR__ . '/../libs/dompdf/autoload.inc.php')) {
     require_once __DIR__ . '/../libs/dompdf/autoload.inc.php';
 } else {
@@ -14,7 +14,8 @@ use Dompdf\Options;
 if (isset($_GET['id'])) {
     $id_contrato = $_GET['id'];
 
-    // CONSULTA CORRETA: Busca o contrato e o aluno ESPECÍFICO deste contrato para evitar troca de nomes entre irmãos
+    // aqui é a consulta correta, 
+    // isso significa que ele vai buscar o contrato e o aluno esepcifico desse contrato pra evitar troca de nomes entre irmaos
     $sql = "SELECT c.*, a.*, cl.*, e.nomeEscola 
             FROM tb_contrato c
             INNER JOIN tb_alunos a ON c.id_aluno = a.id_aluno
@@ -32,11 +33,11 @@ if (isset($_GET['id'])) {
     $options->set('isRemoteEnabled', true);
     $dompdf = new Dompdf($options);
 
-    // Formatação de datas para a cláusula 5ª
+    // formataçao de datas pra cláusula 5
     $dataInicioFormatada = date('d/m/Y', strtotime($d->dataInicioContrato));
     $dataFimFormatada = date('d/m/Y', strtotime($d->dataFinalContrato));
     
-    // Meses para a data final de assinatura
+    // meses pra data final de assinatura
     $meses = ["01"=>"Janeiro","02"=>"Fevereiro","03"=>"Março","04"=>"Abril","05"=>"Maio","06"=>"Junho","07"=>"Julho","08"=>"Agosto","09"=>"Setembro","10"=>"Outubro","11"=>"Novembro","12"=>"Dezembro"];
     $dataAtualExtenso = date('d') . " de " . $meses[date('m')] . " de " . date('Y');
 

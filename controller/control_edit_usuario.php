@@ -9,12 +9,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         if (!empty($nova_senha)) {
-            // Atualiza com nova senha criptografada
+
+            // atualiza com nova senha criptografada
             $hash = password_hash($nova_senha, PASSWORD_DEFAULT);
             $sql = "UPDATE tb_usuario SET nome = ?, login = ?, senha = ? WHERE id_usuario = ?";
             $pdo->prepare($sql)->execute([$nome, $login, $hash, $id]);
         } else {
-            // Atualiza apenas dados básicos
+
+            // atualiza apenas dados basicos
             $sql = "UPDATE tb_usuario SET nome = ?, login = ? WHERE id_usuario = ?";
             $pdo->prepare($sql)->execute([$nome, $login, $id]);
         }

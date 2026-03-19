@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $periodoDeEstudo = $_POST['periodoDeEstudo'] ?? '';
 
     try {
-        // SQL baseado na estrutura da tb_alunos
+        
         $sql = "INSERT INTO tb_alunos (nomeCompleto, serie, sala, id_cliente, id_escola, periodoDeEstudo) 
                 VALUES (:nome, :serie, :sala, :id_cliente, :id_escola, :periodo)";
         

@@ -2,7 +2,7 @@
 require_once 'config/auth.php'; 
 require_once 'config/conexao.php'; 
 
-// Função para traduzir o mês para Português (abreviado)
+// funçao de traduzir o mes pra portugues
 function getMesPortugues($data) {
     $meses = [
         "01" => "Jan", "02" => "Fev", "03" => "Mar", "04" => "Abr",
@@ -14,7 +14,7 @@ function getMesPortugues($data) {
 }
 
 try {
-    // 1. Consulta de Contratos vinculada estritamente pelo id_aluno
+    // consulta de contratos
     $sqlContratos = "SELECT c.*, cl.NomeCompleto as nome_cliente, cl.id_cliente, a.nomeCompleto as nome_aluno, a.id_aluno as aluno_id,
                  (SELECT DAY(data_pagamento) FROM tb_calendario WHERE id_contrato = c.id_contrato LIMIT 1) as dia_vencimento
                  FROM tb_contrato c 
@@ -23,13 +23,13 @@ try {
                  ORDER BY cl.NomeCompleto ASC, a.nomeCompleto ASC";
     $resContratos = $pdo->query($sqlContratos);
 
-    // Agrupamento Hierárquico para Gestão de Contratos
+    // agrupamento de hierarquia
     $gestaoContratosHierarquia = [];
     while($row = $resContratos->fetch(PDO::FETCH_OBJ)) {
         $gestaoContratosHierarquia[$row->nome_cliente][$row->nome_aluno][] = $row;
     }
 
-    // --- CÁLCULOS FINANCEIROS ---
+    // calculos financeiros
     $sqlTotalRestante = "SELECT SUM(c.valorParcela) as total 
                          FROM tb_calendario cal
                          JOIN tb_contrato c ON cal.id_contrato = c.id_contrato
@@ -51,7 +51,7 @@ try {
     $stmtMensal->execute([':mes' => $mesAtual, ':ano' => $anoAtual]);
     $faturamentoMensal = $stmtMensal->fetch()->mensal ?? 0;
 
-    // 2. Consulta de Pagamentos - Hierarquia para Calendário
+    // consulta de pagamentos
     $sqlCalendario = "SELECT cal.*, cl.NomeCompleto as cliente, a.nomeCompleto as aluno, c.valorParcela, c.qtdParcela 
                       FROM tb_calendario cal
                       JOIN tb_contrato c ON cal.id_contrato = c.id_contrato
@@ -65,7 +65,7 @@ try {
         $hierarquiaPagamentos[$reg->cliente][$reg->aluno][] = $reg;
     }
 
-    // 4. Consulta de Alunos
+    // consulta de alunos
     $sqlAlunos = "SELECT a.*, e.nomeEscola, cl.NomeCompleto as nome_responsavel 
                   FROM tb_alunos a 
                   LEFT JOIN tb_escolas e ON a.id_escola = e.id

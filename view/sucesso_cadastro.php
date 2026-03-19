@@ -25,7 +25,7 @@ if (!$id_contrato) { header("Location: ../index.php"); exit; }
         }
         .btn-pdf {
             display: inline-block;
-            background: #ef4444; /* Vermelho PDF */
+            background: #ef4444;
             color: white;
             padding: 15px 30px;
             border-radius: 8px;

@@ -10,7 +10,7 @@ if (!isset($_GET['id'])) {
 $id_aluno = $_GET['id'];
 
 try {
-    // Busca dados do aluno e o nome do responsável para referência
+    // busca dados do aluno e o nome do responsável pra referenciar
     $sql = "SELECT a.*, cl.NomeCompleto as nome_responsavel 
             FROM tb_alunos a 
             JOIN tb_clientes cl ON a.id_cliente = cl.id_cliente 
@@ -21,7 +21,7 @@ try {
 
     if (!$aluno) die("Aluno não encontrado.");
 
-    // Busca lista de escolas
+    // busca lista de escolas
     $escolas = $pdo->query("SELECT id, nomeEscola FROM tb_escolas ORDER BY nomeEscola")->fetchAll(PDO::FETCH_OBJ);
 
 } catch (PDOException $e) {

@@ -228,7 +228,7 @@ try {
 
     document.getElementById('qtdParcela').addEventListener('input', calcularDataTermino);
 
-    // MÁSCARAS AUTOMÁTICAS
+    
     const masks = {
         cpf(value) {
             return value

@@ -10,12 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // 1. Busca a quantidade antiga para comparar
+        // aqui ele pega a quantidade antiga pra comparar
         $stmtCheck = $pdo->prepare("SELECT qtdParcela FROM tb_contrato WHERE id_contrato = ?");
         $stmtCheck->execute([$id_contrato]);
         $qtd_antiga = $stmtCheck->fetchColumn();
 
-        // 2. Atualiza os dados do contrato
+        // depois aqui atualiza
         $sqlCon = "UPDATE tb_contrato SET 
                    valorTotalContrato = ?, 
                    qtdParcela = ?,
@@ -30,12 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['status_contrato'], $id_contrato
         ]);
 
-        // 3. Se a quantidade de parcelas mudou, regeramos o calendário
+        // e se a qtd de parcelas mudou, gera o calendario de novo
         if ($nova_qtd != $qtd_antiga) {
-            // Apaga parcelas atuais (Cuidado: isso remove histórico de pagamentos confirmados deste contrato)
+
+            // aqui ele apaga parcelas atuais
             $pdo->prepare("DELETE FROM tb_calendario WHERE id_contrato = ?")->execute([$id_contrato]);
 
-            // Gera novas parcelas
+            // ja aqui ele gera novas parcelas
             $dataBase = new DateTime($_POST['dataInicioContrato']);
             $diaVenc = (int)$_POST['diaVencimento'];
 
@@ -48,7 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->prepare($sqlP)->execute([$id_contrato, ($i + 1), $dataParc->format('Y-m-d')]);
             }
         } else {
-            // Se a quantidade não mudou, apenas atualiza as datas das parcelas existentes se foram alteradas manualmente
+
+            // se a quantidade nao mudou, ele só vai atualizar as datas das parcelas q ja existem caso foram alteradas manualmente
+            
             if (!empty($_POST['parcelas'])) {
                 $stmtParc = $pdo->prepare("UPDATE tb_calendario SET data_pagamento = ? WHERE id_calendario = ?");
                 foreach ($_POST['parcelas'] as $p) {

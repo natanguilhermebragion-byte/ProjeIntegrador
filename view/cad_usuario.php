@@ -59,21 +59,21 @@
     </div>
 
     <script>
-    // Objeto com as funções de formatação
+   
     const handleMasks = {
         cpf(value) {
             return value
-                .replace(/\D/g, '') // Remove tudo que não é número
-                .replace(/(\d{3})(\d)/, '$1.$2') // Coloca ponto após os 3 primeiros números
-                .replace(/(\d{3})(\d)/, '$1.$2') // Coloca ponto após os 6 primeiros números
-                .replace(/(\d{3})(\d{1,2})/, '$1-$2') // Coloca traço após os 9 primeiros números
-                .replace(/(-\d{2})\d+?$/, '$1'); // Limita o fim
+                .replace(/\D/g, '') // tira tudo que nao é número
+                .replace(/(\d{3})(\d)/, '$1.$2') // coloca ponto depois dos 3 primeiros números
+                .replace(/(\d{3})(\d)/, '$1.$2') // coloca ponto depois dos 6 primeiros números
+                .replace(/(\d{3})(\d{1,2})/, '$1-$2') // coloca traço depois dos 9 primeiros números
+                .replace(/(-\d{2})\d+?$/, '$1'); // limita o fim
         },
         telefone(value) {
             return value
                 .replace(/\D/g, '')
-                .replace(/(\d{2})(\d)/, '($1) $2') // DDD entre parênteses
-                .replace(/(\d{5})(\d)/, '$1-$2') // Traço no celular
+                .replace(/(\d{2})(\d)/, '($1) $2') // ajuste pra deixar o DDD entre os parenteses
+                .replace(/(\d{5})(\d)/, '$1-$2') // aqui é o ajuste pra colocar o tracinho no celular
                 .replace(/(-\d{4})\d+?$/, '$1');
         }
     };

@@ -5,12 +5,12 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
     
     try {
-        // Atualiza o status para 'confirmado' na tb_calendario
+        // atualiza o status para 'confirmado' na tabela de calendario
         $sql = "UPDATE tb_calendario SET confirmacao_pagamento = 'confirmado' WHERE id_calendario = ?";
         $stmt = $pdo->prepare($sql);
         
         if ($stmt->execute([$id])) {
-            // Volta para o painel com um marcador de sucesso na URL
+            // volta pro painel com um marcador de sucesso na url
             header("Location: ../index.php?sucesso_pagamento=1");
             exit;
         } else {
@@ -21,7 +21,7 @@ if (isset($_GET['id'])) {
         die("Erro crítico ao atualizar pagamento: " . $e->getMessage());
     }
 } else {
-    // Se acessar o arquivo sem ID, volta para o index
+    // se acessar o arquivo sem um id, volta pro index
     header("Location: ../index.php");
     exit;
 }
