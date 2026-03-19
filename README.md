@@ -30,7 +30,7 @@ Siga os passos abaixo para rodar o projeto localmente (usando XAMPP, WAMP ou Lar
 
 1. Clonar o Repositório
 Bash
-git clone https://github.com/seu-usuario/nome-do-repositorio.git
+git clone https://github.com/natanguilhermebragion-byte/ProjeIntegrador
 Mova a pasta do projeto para o diretório raiz do seu servidor (ex: C:/xampp/htdocs/).
 
 2. Configurar o Banco de Dados
@@ -55,7 +55,7 @@ Bash
 composer require dompdf/dompdf
 5. Executar o Sistema
 Abra o navegador e acesse:
-http://localhost/nome-do-repositorio/index.php
+https://github.com/natanguilhermebragion-byte/ProjeIntegrador
 
 🔑 Acesso Padrão
 Se o banco de dados for novo, insira um usuário manualmente na tabela tb_usuario ou use o padrão cadastrado:
