@@ -89,9 +89,8 @@ try {
         .header-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .btn-logout { background: #ef4444; color: white; text-decoration: none; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; }
         .nav-actions { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-        .btn-add { background: #3b82f6; color: white; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: 0.3s; border: none; }
+        .btn-add { color: white; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: 0.3s; border: none; }
         .btn-add:hover { opacity: 0.8; transform: translateY(-2px); }
-        .btn-pago { background: #059669; color: white; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 12px; }
         .btn-status { padding: 6px; border-radius: 6px; font-size: 14px; color: white; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; min-width: 32px; }
         .resumo-card { background: #1e293b; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b; color: white; min-width: 200px; }
         .right { text-align: right; }
@@ -105,6 +104,12 @@ try {
         .accordion-header:hover { background: #334155 !important; }
         .accordion-content { border-top: 1px solid #334155; }
         .accordion-sub-item { margin-top: 5px; border-left: 4px solid #3b82f6; }
+
+        /* --- Estilos Financeiros --- */
+        .linha-paga { background-color: rgba(16, 185, 129, 0.08) !important; }
+        .linha-pendente { background-color: rgba(245, 158, 11, 0.08) !important; }
+        .btn-pagar { background: #3b82f6; color: white; text-decoration: none; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; transition: 0.3s; display: inline-block; }
+        .btn-pagar:hover { background: #2563eb; transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -122,9 +127,10 @@ try {
     <div class="wrap">
         <div class="nav-actions">
             <div style="display: flex; gap: 10px;">
-                <a href="view/cad_cliente_aluno.php" class="btn-add" style="background: #2563eb;">Novo Cadastro</a>
-                <a href="view/add_aluno_existente.php" class="btn-add" style="background: #059669;">Adicionar Filho</a>
-                <a href="view/cad_usuario.php" class="btn-add" style="background: #E8AA1E; border: none; color: white;">Novo Usuário</a>
+                <a href="view/cad_cliente_aluno.php" class="btn-add" style="background: #2563eb;">Novo Cliente</a>
+                <a href="view/add_aluno_existente.php" class="btn-add" style="background: #059669;">Novo Filho</a>
+                <a href="view/cad_escola.php" class="btn-add" style="background: #06b6d4;">Nova Escola</a>
+                <a href="view/cad_usuario.php" class="btn-add" style="background: #E8AA1E;">Novo Usuário</a>
             </div>
 
             <div style="display: flex; gap: 15px; margin-left: auto;">
@@ -171,25 +177,13 @@ try {
                             ?>
                             <tr>
                                 <td><strong><?= htmlspecialchars($cli->NomeCompleto) ?></strong></td>
-                                <td style="font-size: 12px; color: #94a3b8;">
-                                    CPF: <?= htmlspecialchars($cli->cpf) ?><br>
-                                    RG: <?= htmlspecialchars($cli->rg) ?>
-                                </td>
-                                <td style="font-size: 12px;">
-                                    📞 <?= htmlspecialchars($cli->telefone) ?><br>
-                                    📧 <?= htmlspecialchars($cli->email) ?>
-                                </td>
-                                <td style="font-size: 11px; color: #94a3b8;">
-                                    <?= htmlspecialchars($cli->logradouro) ?>, <?= htmlspecialchars($cli->numero) ?><br>
-                                    <?= htmlspecialchars($cli->bairro) ?> • CEP: <?= htmlspecialchars($cli->cep) ?>
-                                </td>
+                                <td style="font-size: 12px; color: #94a3b8;">CPF: <?= htmlspecialchars($cli->cpf) ?><br>RG: <?= htmlspecialchars($cli->rg) ?></td>
+                                <td style="font-size: 12px;">📞 <?= htmlspecialchars($cli->telefone) ?><br>📧 <?= htmlspecialchars($cli->email) ?></td>
+                                <td style="font-size: 11px; color: #94a3b8;"><?= htmlspecialchars($cli->logradouro) ?>, <?= htmlspecialchars($cli->numero) ?><br><?= htmlspecialchars($cli->bairro) ?> • CEP: <?= htmlspecialchars($cli->cep) ?></td>
                                 <td class="right actions">
                                     <div style="display: flex; gap: 5px; justify-content: flex-end;">
                                         <a href="view/edit_cliente.php?id=<?= $cli->id_cliente ?>" class="btn-status" style="background: #6366f1;" title="Editar Cliente">✏️</a>
-                                        <a href="controller/control_excluir_cliente.php?id=<?= $cli->id_cliente ?>" 
-                                           class="btn-status" 
-                                           style="background: #ef4444;" 
-                                           onclick="return confirm('ATENÇÃO: Isso excluirá o responsável, todos os seus filhos e contratos vinculados. Deseja continuar?')">🗑️</a>
+                                        <a href="controller/control_excluir_cliente.php?id=<?= $cli->id_cliente ?>" class="btn-status" style="background: #ef4444;" onclick="return confirm('Excluir?')">🗑️</a>
                                     </div>
                                 </td>
                             </tr>
@@ -202,59 +196,63 @@ try {
 
         <div id="aba-pagamentos" class="tab-content" style="display:none;">
             <section class="card">
-                <div class="toolbar"><h2>Calendário de Pagamentos</h2></div>
+                <div class="toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <h2>Calendário de Pagamentos</h2>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;">
+                        <select id="filtro-status-pagamento" onchange="filtrarPagamentosGeral()" style="width: 130px; padding: 6px; border-radius: 6px; background: #0b1220; color: white; border: 1px solid var(--line);">
+                            <option value="todos">Todos Status</option>
+                            <option value="pendente" selected>Pendentes</option>
+                            <option value="pago">Pagos</option>
+                        </select>
+
+                        <input type="month" id="filtro-mes-pagamento" onchange="filtrarPagamentosGeral()" style="width: 160px; padding: 5px; border-radius: 6px; background: #0b1220; color: white; border: 1px solid var(--line);">
+                        
+                        <button onclick="limparFiltroPagamento()" class="pill" style="border:none; cursor:pointer; background: var(--line); height: 32px; padding: 0 15px;">Limpar</button>
+                    </div>
+                </div>
+                
                 <div class="accordion-container">
                     <?php foreach($hierarquiaPagamentos as $nomeResponsavel => $filhos): 
-                        $idResp = "resp_" . preg_replace("/[^a-zA-Z0-9]/", "", $nomeResponsavel); 
+                        $idResp = "pay_resp_" . preg_replace("/[^a-zA-Z0-9]/", "", $nomeResponsavel); 
                     ?>
                         <div class="accordion-item" style="margin-bottom: 10px; border: 1px solid #334155; border-radius: 8px;">
                             <button class="accordion-header" onclick="toggleAccordion('<?= $idResp ?>')" style="width: 100%; padding: 15px; background: #1e293b; color: white; border: none; text-align: left; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
                                 <span>👤 CLIENTE: <?= htmlspecialchars($nomeResponsavel) ?></span>
-                                <small style="background: #3b82f6; padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-                                    <?= count($filhos) ?> Filho(s) vinculado(s)
-                                </small>
+                                <small style="background: #3b82f6; padding: 2px 8px; border-radius: 10px; font-size: 11px;"><?= count($filhos) ?> Filho(s)</small>
                             </button>
-
                             <div id="<?= $idResp ?>" class="accordion-content" style="display: none; padding: 10px; background: #0f172a;">
                                 <?php foreach($filhos as $nomeFilho => $parcelas): 
-                                    $idFilho = "filho_" . preg_replace("/[^a-zA-Z0-9]/", "", $nomeResponsavel . $nomeFilho); 
+                                    $idFilho = "pay_filho_" . preg_replace("/[^a-zA-Z0-9]/", "", $nomeResponsavel . $nomeFilho); 
                                 ?>
                                     <div class="accordion-sub-item">
                                         <button class="accordion-header" onclick="toggleAccordion('<?= $idFilho ?>')" style="width: 100%; padding: 12px; background: #1e293b; color: #94a3b8; border: none; text-align: left; cursor: pointer; font-size: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;">
                                             <span>🎒 ALUNO: <?= htmlspecialchars($nomeFilho) ?></span>
-                                            <small style="opacity: 0.7;"><?= count($parcelas) ?> Parcelas</small>
                                         </button>
-
                                         <div id="<?= $idFilho ?>" class="accordion-content" style="display: none; padding: 10px; background: #0b1220;">
-                                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                                                <thead>
-                                                    <tr style="border-bottom: 1px solid #334155; opacity: 0.5;">
-                                                        <th align="left">Parcela / Vencimento</th>
-                                                        <th align="left">Valor</th>
-                                                        <th align="center">Status</th>
-                                                        <th align="right">Ação</th>
-                                                    </tr>
-                                                </thead>
+                                            <table style="width: 100%; font-size: 13px;">
                                                 <tbody>
-                                                    <?php foreach($parcelas as $p): ?>
-                                                        <tr style="border-bottom: 1px solid #1e293b;">
+                                                    <?php foreach($parcelas as $p): 
+                                                        $estaPago = ($p->confirmacao_pagamento == 'confirmado');
+                                                    ?>
+                                                        <tr class="<?= $estaPago ? 'linha-paga' : 'linha-pendente' ?>" style="border-bottom: 1px solid #1e293b;">
                                                             <td style="padding: 10px;">
                                                                 <strong><?= $p->numero_parcela ?> / <?= $p->qtdParcela ?></strong><br>
                                                                 <small style="color: #94a3b8;">📅 Vencimento: <?= date('d/m/Y', strtotime($p->data_pagamento)) ?></small>
                                                             </td>
                                                             <td>R$ <?= number_format($p->valorParcela, 2, ',', '.') ?></td>
                                                             <td align="center">
-                                                                <span class="pill" style="background: <?= ($p->confirmacao_pagamento == 'confirmado') ? '#059669' : '#f59e0b' ?>;">
-                                                                    <?= ucfirst($p->confirmacao_pagamento) ?>
+                                                                <span class="pill status-text" style="background: <?= $estaPago ? '#059669' : '#f59e0b' ?>;">
+                                                                    <?= $estaPago ? 'Pago' : 'Pendente' ?>
                                                                 </span>
                                                             </td>
                                                             <td align="right">
-                                                                <?php if($p->confirmacao_pagamento === 'pendente'): ?>
-                                                                    <a href="controller/control_pagamento.php?id=<?= $p->id_calendario ?>" class="btn-pago">✔ Pago</a>
+                                                                <?php if(!$estaPago): ?>
+                                                                    <a href="controller/control_pagamento.php?id=<?= $p->id_calendario ?>" class="btn-pagar">✔ Pagar</a>
                                                                 <?php else: ?>
                                                                     <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                                                                        <small style="color: #10b981;">Confirmado</small>
-                                                                        <a href="controller/control_estorno_pagamento.php?id=<?= $p->id_calendario ?>" style="color: #ef4444; font-size: 10px;" onclick="return confirm('Desfazer?')">Desfazer</a>
+                                                                        <small style="color: #10b981; font-weight: bold;">✔ Confirmado</small>
+                                                                        <a href="controller/control_estorno_pagamento.php?id=<?= $p->id_calendario ?>" style="color: #ef4444; font-size: 10px; text-decoration:none;" onclick="return confirm('Estornar?')">Desfazer</a>
                                                                     </div>
                                                                 <?php endif; ?>
                                                             </td>
@@ -273,73 +271,39 @@ try {
         </div>
 
         <div id="aba-contratos" class="tab-content" style="display:none;">
-            <section class="card">
+             <section class="card">
                 <div class="toolbar">
                     <h2>Gestão de Contratos</h2>
-                    <input type="search" id="busca-contratos" placeholder="Filtrar responsável ou aluno..." onkeyup="filtrarContratosAccordion()">
+                    <input type="search" id="busca-contratos" placeholder="Filtrar..." onkeyup="filtrarContratosAccordion()">
                 </div>
-                
                 <div class="accordion-container">
                     <?php foreach($gestaoContratosHierarquia as $nomePai => $alunos): 
-                        $idSetorPai = "gestao_pai_" . preg_replace("/[^a-zA-Z0-9]/", "", $nomePai); 
+                        $idSetorPai = "gest_pai_" . preg_replace("/[^a-zA-Z0-9]/", "", $nomePai); 
                     ?>
-                        <div class="accordion-item" style="margin-bottom: 10px; border: 1px solid #334155; border-radius: 8px; overflow: hidden;">
-                            <button class="accordion-header" onclick="toggleAccordion('<?= $idSetorPai ?>')" style="width: 100%; padding: 15px; background: #1e293b; color: white; border: none; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold;">
+                        <div class="accordion-item" style="margin-bottom: 10px; border: 1px solid #334155; border-radius: 8px;">
+                            <button class="accordion-header" onclick="toggleAccordion('<?= $idSetorPai ?>')" style="width: 100%; padding: 15px; background: #1e293b; color: white; border: none; text-align: left; cursor: pointer; font-weight: bold;">
                                 <span>👤 RESPONSÁVEL: <?= htmlspecialchars($nomePai) ?></span>
-                                <small style="background: #3b82f6; padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-                                    <?= count($alunos) ?> Aluno(s)
-                                </small>
                             </button>
-
-                            <div id="<?= $idSetorPai ?>" class="accordion-content" style="display: none; background: #0f172a; padding: 10px;">
-                                
+                            <div id="<?= $idSetorPai ?>" class="accordion-content" style="display: none; padding: 10px;">
                                 <?php foreach($alunos as $nomeFilho => $contratos): 
-                                    $idSetorFilho = "gestao_filho_" . preg_replace("/[^a-zA-Z0-9]/", "", $nomePai . $nomeFilho); 
+                                    $idSetorFilho = "gest_filho_" . preg_replace("/[^a-zA-Z0-9]/", "", $nomePai . $nomeFilho); 
                                 ?>
-                                    <div class="accordion-sub-item" style="margin-bottom: 8px; border-left: 4px solid #6366f1;">
-                                        <button class="accordion-header" onclick="toggleAccordion('<?= $idSetorFilho ?>')" style="width: 100%; padding: 12px; background: #1e293b; color: #94a3b8; border: none; text-align: left; cursor: pointer; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="accordion-sub-item">
+                                        <button class="accordion-header" onclick="toggleAccordion('<?= $idSetorFilho ?>')" style="width: 100%; padding: 12px; background: #1e293b; color: #94a3b8; border: none; text-align: left; cursor: pointer; font-size: 14px;">
                                             <span>🎒 ALUNO: <?= htmlspecialchars($nomeFilho) ?></span>
-                                            <small style="opacity: 0.7;"><?= count($contratos) ?> Contrato(s)</small>
                                         </button>
-
-                                        <div id="<?= $idSetorFilho ?>" class="accordion-content" style="display: none; padding: 10px; background: #0b1220;">
-                                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                                                <thead>
-                                                    <tr style="border-bottom: 1px solid #334155; opacity: 0.7;">
-                                                        <th align="left">Vigência</th>
-                                                        <th align="left">Vencimento</th>
-                                                        <th class="right">Parcela</th>
-                                                        <th class="right">Total</th>
-                                                        <th align="center">Status</th>
-                                                        <th align="right">Ações</th>
-                                                    </tr>
-                                                </thead>
+                                        <div id="<?= $idSetorFilho ?>" class="accordion-content" style="display: none; padding: 10px;">
+                                            <table style="width: 100%; font-size: 13px;">
                                                 <tbody>
-                                                    <?php foreach($contratos as $c): 
-                                                        $status = $c->status_contrato ?? 'Ativo'; 
-                                                        $corPill = ($status == 'Finalizado') ? '#334155' : (($status == 'Pendente') ? '#f59e0b' : '#059669');
-                                                        $inicio = date('d/m/Y', strtotime($c->dataInicioContrato));
-                                                        $fim    = (!empty($c->dataFinalContrato)) ? date('d/m/Y', strtotime($c->dataFinalContrato)) : '---';
-                                                    ?>
-                                                    <tr style="border-bottom: 1px solid #1e293b;">
-                                                        <td style="padding: 10px; font-size: 12px;">
-                                                            <span style="color: #059669;">Ini: <?= $inicio ?></span><br>
-                                                            <span style="color: #ef4444;">Fim: <?= $fim ?></span>
-                                                        </td>
-                                                        <td style="color: #3b82f6; font-weight: bold;">
-                                                            📅 Dia <?= str_pad($c->dia_vencimento, 2, "0", STR_PAD_LEFT) ?>
-                                                        </td>
-                                                        <td class="right">R$ <?= number_format($c->valorParcela, 2, ',', '.') ?> (<?= $c->qtdParcela ?>x)</td>
-                                                        <td class="right"><strong>R$ <?= number_format($c->valorTotalContrato, 2, ',', '.') ?></strong></td>
-                                                        <td align="center"><span class="pill" style="background: <?= $corPill ?>; font-size: 10px;"><?= $status ?></span></td>
-                                                        <td align="right" class="actions">
-                                                            <div style="display: flex; gap: 5px; justify-content: flex-end;">
-                                                                <a href="view/edit_contrato.php?id=<?= $c->id_contrato ?>" class="btn-status" style="background: #6366f1;" title="Editar">✏️</a>
-                                                                <a href="view/gerar_pdf_contrato.php?id=<?= $c->id_contrato ?>" target="_blank" class="btn-status" style="background: #334155; border: 1px solid #ef4444;" title="PDF">📄</a>
-                                                                <a href="controller/control_excluir_geral.php?id_contrato=<?= $c->id_contrato ?>" class="btn-status" style="background: #ef4444;" onclick="return confirm('Excluir Contrato?')">🗑️</a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
+                                                    <?php foreach($contratos as $c): ?>
+                                                        <tr style="border-bottom: 1px solid #1e293b;">
+                                                            <td>Ini: <?= date('d/m/Y', strtotime($c->dataInicioContrato)) ?></td>
+                                                            <td class="right">R$ <?= number_format($c->valorParcela, 2, ',', '.') ?></td>
+                                                            <td class="right actions">
+                                                                <a href="view/edit_contrato.php?id=<?= $c->id_contrato ?>" class="btn-status" style="background: #6366f1;">✏️</a>
+                                                                <a href="controller/control_excluir_geral.php?id_contrato=<?= $c->id_contrato ?>" class="btn-status" style="background: #ef4444;" onclick="return confirm('Excluir?')">🗑️</a>
+                                                            </td>
+                                                        </tr>
                                                     <?php endforeach; ?>
                                                 </tbody>
                                             </table>
@@ -357,64 +321,50 @@ try {
             <section class="card">
                 <div class="toolbar">
                     <h2>Alunos Matriculados</h2>
-                    <input type="search" id="busca-alunos" placeholder="Filtrar alunos..." onkeyup="filtrarTabela('tbl-alunos', this.value)">
+                    <input type="search" placeholder="Filtrar..." onkeyup="filtrarTabela('tbl-alunos', this.value)">
                 </div>
-                <div style="overflow:auto;">
-                    <table id="tbl-alunos">
-                        <thead>
-                            <tr>
-                                <th>Aluno</th>
-                                <th>Responsável</th>
-                                <th>Série/Sala</th>
-                                <th>Escola</th>
-                                <th class="right">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while($a = $resAlunos->fetch(PDO::FETCH_OBJ)): ?>
-                            <tr>
-                                <td><strong><?= htmlspecialchars($a->nomeCompleto) ?></strong></td>
-                                <td><?= htmlspecialchars($a->nome_responsavel ?? '---') ?></td>
-                                <td><?= htmlspecialchars($a->serie) ?> / <?= htmlspecialchars($a->sala ?? 'S/S') ?></td>
-                                <td><?= htmlspecialchars($a->nomeEscola ?? 'Não vinculada') ?></td>
-                                <td class="right actions">
-                                    <a href="view/edit_aluno_individual.php?id=<?= $a->id_aluno ?>" class="btn-status" style="background: #6366f1;">✏️</a>
-                                    <a href="controller/control_excluir_aluno.php?id=<?= $a->id_aluno ?>" class="btn-status" style="background: #ef4444;" onclick="return confirm('Remover Aluno?')">🗑️</a>
-                                </td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                </div>
+                <table id="tbl-alunos">
+                    <thead><tr><th>Aluno</th><th>Responsável</th><th>Escola</th><th class="right">Ações</th></tr></thead>
+                    <tbody>
+                        <?php while($a = $resAlunos->fetch(PDO::FETCH_OBJ)): ?>
+                        <tr>
+                            <td><strong><?= htmlspecialchars($a->nomeCompleto) ?></strong></td>
+                            <td><?= htmlspecialchars($a->nome_responsavel ?? '---') ?></td>
+                            <td><?= htmlspecialchars($a->nomeEscola ?? 'Não vinculada') ?></td>
+                            <td class="right actions">
+                                <a href="view/edit_aluno_individual.php?id=<?= $a->id_aluno ?>" class="btn-status" style="background: #6366f1;">✏️</a>
+                                <a href="controller/control_excluir_aluno.php?id=<?= $a->id_aluno ?>" class="btn-status" style="background: #ef4444;" onclick="return confirm('Remover?')">🗑️</a>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
             </section>
         </div>
 
         <div id="aba-usuarios" class="tab-content" style="display:none;">
             <section class="card">
                 <div class="toolbar"><h2>Operadores do Sistema</h2></div>
-                <div style="overflow:auto;">
-                    <table>
-                        <thead><tr><th>Nome</th><th>Login</th><th>E-mail</th><th class="right">Ações</th></tr></thead>
-                        <tbody>
-                            <?php 
-                            $resUsers = $pdo->query("SELECT id_usuario, nome, login, email FROM tb_usuario");
-                            while($u = $resUsers->fetch(PDO::FETCH_OBJ)): 
-                            ?>
-                            <tr>
-                                <td><?= htmlspecialchars($u->nome) ?></td>
-                                <td><code><?= htmlspecialchars($u->login) ?></code></td>
-                                <td><?= htmlspecialchars($u->email) ?></td>
-                                <td class="right actions">
-                                    <a href="view/edit_usuario.php?id=<?= $u->id_usuario ?>" class="btn-status" style="background: #6366f1;">✏️</a>
-                                    <?php if($u->id_usuario != $_SESSION['usuario_id']): ?>
-                                        <a href="controller/control_excluir_usuario.php?id=<?= $u->id_usuario ?>" class="btn-status" style="background: #ef4444;" onclick="return confirm('Remover acesso?')">🗑️</a>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                </div>
+                <table>
+                    <thead><tr><th>Nome</th><th>Login</th><th class="right">Ações</th></tr></thead>
+                    <tbody>
+                        <?php 
+                        $resUsers = $pdo->query("SELECT id_usuario, nome, login FROM tb_usuario");
+                        while($u = $resUsers->fetch(PDO::FETCH_OBJ)): 
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($u->nome) ?></td>
+                            <td><code><?= htmlspecialchars($u->login) ?></code></td>
+                            <td class="right actions">
+                                <a href="view/edit_usuario.php?id=<?= $u->id_usuario ?>" class="btn-status" style="background: #6366f1;">✏️</a>
+                                <?php if($u->id_usuario != $_SESSION['usuario_id']): ?>
+                                    <a href="controller/control_excluir_usuario.php?id=<?= $u->id_usuario ?>" class="btn-status" style="background: #ef4444;" onclick="return confirm('Remover?')">🗑️</a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
             </section>
         </div>
     </div>
@@ -432,34 +382,91 @@ try {
 
     function toggleAccordion(id) {
         var content = document.getElementById(id);
-        if (content.style.display === "none" || content.style.display === "") {
-            content.style.display = "block";
-        } else {
-            content.style.display = "none";
-        }
+        if(!content) return;
+        content.style.display = (content.style.display === "none" || content.style.display === "") ? "block" : "none";
     }
 
-    function filtrarContratosAccordion() {
-        var input = document.getElementById("busca-contratos");
-        var filter = input.value.toUpperCase();
-        var items = document.querySelectorAll("#aba-contratos .accordion-item");
-        items.forEach(function(item) {
-            var headerText = item.querySelector(".accordion-header span").textContent || item.querySelector(".accordion-header span").innerText;
-            item.style.display = (headerText.toUpperCase().indexOf(filter) > -1) ? "" : "none";
+    function filtrarPagamentosGeral() {
+        const statusFiltro = document.getElementById('filtro-status-pagamento').value;
+        const dataFiltro = document.getElementById('filtro-mes-pagamento').value;
+
+        const itensAccordion = document.querySelectorAll('#aba-pagamentos .accordion-item');
+
+        itensAccordion.forEach(item => {
+            let temCorrespondenciaNoMes = false;
+            const subItens = item.querySelectorAll('.accordion-sub-item');
+
+            subItens.forEach(sub => {
+                let alunoTemCorrespondencia = false;
+                const linhas = sub.querySelectorAll('tbody tr');
+
+                linhas.forEach(linha => {
+                    const statusTexto = linha.querySelector('.status-text').innerText.toLowerCase().trim();
+                    const smallElement = linha.querySelector('small');
+                    const textoVencimento = smallElement ? smallElement.innerText : "";
+                    const partes = textoVencimento.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+                    
+                    let mesAnoParcela = partes ? `${partes[3]}-${partes[2]}` : null;
+
+                    const bateStatus = (statusFiltro === 'todos') || (statusTexto === statusFiltro);
+                    const bateData = (!dataFiltro) || (mesAnoParcela === dataFiltro);
+
+                    if (bateStatus && bateData) {
+                        linha.style.display = ""; 
+                        alunoTemCorrespondencia = true;
+                    } else {
+                        linha.style.display = "none"; 
+                    }
+                });
+
+                if (alunoTemCorrespondencia) {
+                    sub.style.display = "";
+                    const subContent = sub.querySelector('.accordion-content');
+                    if(subContent) subContent.style.display = "block";
+                    temCorrespondenciaNoMes = true;
+                } else {
+                    sub.style.display = "none";
+                }
+            });
+
+            if (temCorrespondenciaNoMes) {
+                item.style.display = "";
+                const itemContent = item.querySelector('.accordion-content');
+                if(itemContent) itemContent.style.display = "block";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    }
+
+    function limparFiltroPagamento() {
+        document.getElementById('filtro-status-pagamento').value = "todos";
+        document.getElementById('filtro-mes-pagamento').value = "";
+        
+        document.querySelectorAll('#aba-pagamentos .accordion-item, #aba-pagamentos .accordion-sub-item, #aba-pagamentos tr').forEach(el => {
+            el.style.display = "";
+        });
+        document.querySelectorAll('#aba-pagamentos .accordion-content').forEach(el => {
+            el.style.display = "none";
         });
     }
 
     function filtrarTabela(idTabela, valor) {
         var filter = valor.toUpperCase();
-        var table = document.getElementById(idTabela);
-        var tr = table.getElementsByTagName("tr");
+        var tr = document.getElementById(idTabela).getElementsByTagName("tr");
         for (var i = 1; i < tr.length; i++) {
             var td = tr[i].getElementsByTagName("td")[0]; 
             if (td) {
-                var txtValue = td.textContent || td.innerText;
-                tr[i].style.display = (txtValue.toUpperCase().indexOf(filter) > -1) ? "" : "none";
+                tr[i].style.display = (td.textContent.toUpperCase().indexOf(filter) > -1) ? "" : "none";
             }
         }
+    }
+
+    function filtrarContratosAccordion() {
+        var filter = document.getElementById("busca-contratos").value.toUpperCase();
+        document.querySelectorAll("#aba-contratos .accordion-item").forEach(function(item) {
+            item.style.display = (item.innerText.toUpperCase().indexOf(filter) > -1) ? "" : "none";
+        });
     }
     </script>
 </body>
