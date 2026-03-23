@@ -196,20 +196,20 @@ try {
 
         <div id="aba-pagamentos" class="tab-content" style="display:none;">
             <section class="card">
-                <div class="toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div class="toolbar" style="display: flex; justify-content: flex-start; align-items: center; flex-wrap: wrap; gap: 15px;">
                     <h2>Calendário de Pagamentos</h2>
                     
-                    <div style="display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;">
-                        <select id="filtro-status-pagamento" onchange="filtrarPagamentosGeral()" style="width: 130px; padding: 6px; border-radius: 6px; background: #0b1220; color: white; border: 1px solid var(--line);">
-                            <option value="todos">Todos Status</option>
-                            <option value="pendente" selected>Pendentes</option>
-                            <option value="pago">Pagos</option>
-                        </select>
+                    <input type="search" id="busca-nome-pagamento" onkeyup="filtrarPagamentosGeral()" placeholder="Buscar cliente ou aluno..." style="width: 220px; padding: 10px 12px; border-radius: 8px; background: #0b1220; color: white; border: 1px solid var(--line);">
 
-                        <input type="month" id="filtro-mes-pagamento" onchange="filtrarPagamentosGeral()" style="width: 160px; padding: 5px; border-radius: 6px; background: #0b1220; color: white; border: 1px solid var(--line);">
-                        
-                        <button onclick="limparFiltroPagamento()" class="pill" style="border:none; cursor:pointer; background: var(--line); height: 32px; padding: 0 15px;">Limpar</button>
-                    </div>
+                    <select id="filtro-status-pagamento" onchange="filtrarPagamentosGeral()" style="width: 140px; padding: 10px; border-radius: 8px; background: #0b1220; color: white; border: 1px solid var(--line);">
+                        <option value="todos">Todos Status</option>
+                        <option value="pendente" selected>Pendentes</option>
+                        <option value="pago">Pagos</option>
+                    </select>
+
+                    <input type="month" id="filtro-mes-pagamento" onchange="filtrarPagamentosGeral()" required style="width: 160px; padding: 10px; border-radius: 8px; background: #0b1220; color: white; border: 1px solid var(--line);">
+                    
+                    <button onclick="limparFiltroPagamento()" class="pill" style="border:none; cursor:pointer; background: var(--line); height: 38px; padding: 0 15px; border-radius: 8px;">Limpar</button>
                 </div>
                 
                 <div class="accordion-container">
@@ -387,17 +387,24 @@ try {
     }
 
     function filtrarPagamentosGeral() {
+        const buscaNome = document.getElementById('busca-nome-pagamento').value.toUpperCase();
         const statusFiltro = document.getElementById('filtro-status-pagamento').value;
         const dataFiltro = document.getElementById('filtro-mes-pagamento').value;
 
         const itensAccordion = document.querySelectorAll('#aba-pagamentos .accordion-item');
 
         itensAccordion.forEach(item => {
-            let temCorrespondenciaNoMes = false;
+            const nomeResponsavel = item.querySelector('.accordion-header span').innerText.toUpperCase();
+            let responsavelTemMatch = nomeResponsavel.includes(buscaNome);
+            let temParcelaVisivelNoPai = false;
+
             const subItens = item.querySelectorAll('.accordion-sub-item');
 
             subItens.forEach(sub => {
-                let alunoTemCorrespondencia = false;
+                const nomeAluno = sub.querySelector('.accordion-header span').innerText.toUpperCase();
+                let alunoTemMatch = nomeAluno.includes(buscaNome);
+                let temParcelaVisivelNoFilho = false;
+
                 const linhas = sub.querySelectorAll('tbody tr');
 
                 linhas.forEach(linha => {
@@ -405,31 +412,31 @@ try {
                     const smallElement = linha.querySelector('small');
                     const textoVencimento = smallElement ? smallElement.innerText : "";
                     const partes = textoVencimento.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-                    
                     let mesAnoParcela = partes ? `${partes[3]}-${partes[2]}` : null;
 
                     const bateStatus = (statusFiltro === 'todos') || (statusTexto === statusFiltro);
                     const bateData = (!dataFiltro) || (mesAnoParcela === dataFiltro);
+                    const bateNome = (buscaNome === "") || responsavelTemMatch || alunoTemMatch;
 
-                    if (bateStatus && bateData) {
+                    if (bateStatus && bateData && bateNome) {
                         linha.style.display = ""; 
-                        alunoTemCorrespondencia = true;
+                        temParcelaVisivelNoFilho = true;
                     } else {
                         linha.style.display = "none"; 
                     }
                 });
 
-                if (alunoTemCorrespondencia) {
+                if (temParcelaVisivelNoFilho) {
                     sub.style.display = "";
                     const subContent = sub.querySelector('.accordion-content');
                     if(subContent) subContent.style.display = "block";
-                    temCorrespondenciaNoMes = true;
+                    temParcelaVisivelNoPai = true;
                 } else {
                     sub.style.display = "none";
                 }
             });
 
-            if (temCorrespondenciaNoMes) {
+            if (temParcelaVisivelNoPai) {
                 item.style.display = "";
                 const itemContent = item.querySelector('.accordion-content');
                 if(itemContent) itemContent.style.display = "block";
@@ -440,6 +447,7 @@ try {
     }
 
     function limparFiltroPagamento() {
+        document.getElementById('busca-nome-pagamento').value = "";
         document.getElementById('filtro-status-pagamento').value = "todos";
         document.getElementById('filtro-mes-pagamento').value = "";
         
