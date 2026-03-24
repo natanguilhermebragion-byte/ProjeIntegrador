@@ -301,6 +301,7 @@ try {
                                                             <td class="right">R$ <?= number_format($c->valorParcela, 2, ',', '.') ?></td>
                                                             <td class="right actions">
                                                                 <a href="view/edit_contrato.php?id=<?= $c->id_contrato ?>" class="btn-status" style="background: #6366f1;">✏️</a>
+                                                                <a href="view/gerar_pdf_contrato.php?id=<?= $c->id_contrato ?>" target="_blank" class="btn-status" style="background: #334155; border: 1px solid #ef4444;" title="PDF">📄</a>
                                                                 <a href="controller/control_excluir_geral.php?id_contrato=<?= $c->id_contrato ?>" class="btn-status" style="background: #ef4444;" onclick="return confirm('Excluir?')">🗑️</a>
                                                             </td>
                                                         </tr>
